@@ -60,4 +60,5 @@ resource "aws_instance" "ntp_server" {
   }
 }
 
+** while try to fetch name or ID we need to refer Attributes Reference in documents
 After running code key-tf will get attach to Ec2 instance
