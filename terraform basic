@@ -1,0 +1,51 @@
+
+# Terraform syntax ---- single Block example Terraform File
+# <BLOCK TYPE> "<BLOCK LABEL>" "<BLOCK LABEL>" {
+# Block body
+#<IDENTIFIER> = <EXPRESSION> # Argument
+# }
+
+
+output "hello" {
+    value = " Mr. Sehgal"
+  
+}
+
+
+# Multiple Block in Single Terraform File 
+
+output "firstoutputblock" {
+        value = " this is first hello world block"
+}
+
+output "secondoutputblock" {
+        value = "this is second hello world block"
+}
+
+output "thirdoutputblock" {
+        value = "this is third hello world block"
+}
+
+
+### Terraform Variables ########################
+### Terraform will take value of username as input (we give it sehgal) and it will return the output as Hello, Sehgal.
+
+variable username {}
+
+output printname {
+    value = "Hello, ${var.username}"
+}
+
+###########################################################
+
+# OUTPUT for above code will be 
+
+note terraform run code by alphabatically order so output will be not in order as per above code
+
+
+
++ firstoutputblock  = " this is first hello world block"
++ hello             = " Mr. Sehgal"
++ printname         = "Hello, vikas"
++ secondoutputblock = "this is second hello world block"
++ thirdoutputblock  = "this is third hello world block"
