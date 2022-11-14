@@ -1,0 +1,63 @@
+In This part we will create key and assign to EC2 Instance
+
+In next part we will add security group to Ec2 Instance
+
+Creating SSH Key and it will generate two files [ id_rsa --- this is private key & id_rsa.pub ---This is public key]
+
+
+PS C:\Users\visehgal\.vscode\terraform\Terraform_AWS_step_by_step_EC2\aws-first-instance> ssh-keygen -t rsa
+Generating public/private rsa key pair.
+Enter file in which to save the key (C:\Users\visehgal/.ssh/id_rsa): ./id_rsa
+Enter passphrase (empty for no passphrase): 
+Enter same passphrase again: 
+Your identification has been saved in ./id_rsa.
+Your public key has been saved in ./id_rsa.pub.
+The key fingerprint is:
+SHA256:Gr/og1NRy1OsVQTe0/Ni+vVNI7Yt/Mp+WoBcKBeTEnY cisco\visehgal@DESKTOP-AMJ8IC2
+The key's randomart image is:
++---[RSA 3072]----+
+|         +oE+    |
+|        oo=o+.   |
+|       o *ooo.o  |
+|      . = + o. o |
+|      ..S. o .o .|
+|      .+     o.. |
+|     o. .   oo oo|
+|    o .. .  o+=++|
+|     oo..   .*Boo|
++----[SHA256]-----+
+
+#################### aws-kp.tf file content ##############################
+## Here path.module is function which help in finding path for file
+document link
+
+https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/key_pair
+--------------------------------------------------------------------------------------------
+resource "aws_key_pair" "key-tf" {
+  key_name   = "key-tf"
+  public_key = file("${path.module}/id_rsa.pub")
+}
+------------------------------------------------------------------------------------------
+Output from Console FYI
+aws_key_pair.key-tf: Creating...
+aws_instance.ntp_server: Creating...
+aws_key_pair.key-tf: Creation complete after 1s [id=key-tf]
+aws_instance.ntp_server: Still creating... [10s elapsed]
+aws_instance.ntp_server: Still creating... [20s elapsed]
+aws_instance.ntp_server: Still creating... [30s elapsed]
+aws_instance.ntp_server: Creation complete after 32s [id=i-0a0be8cc91a1a22ed]
+
+-----------------------------------------------------------------------------------------------------------------
+
+++ We can assaign appve key with EC2 instance with below code
+
+resource "aws_instance" "ntp_server" {
+  ami           = "ami-0e6329e222e662a52"
+  instance_type = "t2.micro"
+  key_name      = aws_key_pair.key-tf.key_name     >>>>>>>>>>>>>>>>>>>> This line is added and value is calculted from aws-kp.tf file
+  tags = {
+    Name = "first-terraform-instance"
+  }
+}
+
+After running code key-tf will get attach to Ec2 instance
