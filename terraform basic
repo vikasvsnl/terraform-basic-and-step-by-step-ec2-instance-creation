@@ -49,3 +49,121 @@ note terraform run code by alphabatically order so output will be not in order a
 + printname         = "Hello, vikas"
 + secondoutputblock = "this is second hello world block"
 + thirdoutputblock  = "this is third hello world block"
+
+==========================================================================================
+variable can pass by below command
+
+terraform plan -var "username=Sehgal"
+
+============================================================================================
+in case variables are multiple
+
+$terraform plan -var "<VARIABLE_1_NAME>=<VARIABLE_1_VALUE>" -var "<VARIABLE_2_NAME>=<VARIABLE_2_VALUE>"
+
+====================================================================================================
+
+++ The type argument in a variable block allows you to restrict the type of value that will be accepted as the value for a variable. 
+++ If no type constraint is set then a value of any type is accepted.
+
+++ Type constraints are created from a mixture of type keywords and type constructors. The supported type keywords are:
+
+string
+number
+bool
+++ The type constructors allow you to specify complex types such as collections:
+
+list
+map
+
+
+variable username {
+  type = string
+  default = "sehgal"
+
+}
+
+variable age {
+  type = number
+  default = 35
+}
+
+output "printvariable" {
+  value = "Hello ${var.username} and your age is ${var.age}"
+}
+
+########### LIST VARIABLES
+
+variable users {
+    type = list
+}
+
+output printfirst {
+  value = "first user is ${(var.users[1])}"
+}
+
+OUTPUT >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+var.users
+  Enter a value: [ "A", "B", "C"]
+Changes to Outputs:
+  + printfirst = "first user is A"
+  
+########### Terraform Map Variable #################################
+
+variable "images" {
+  type    = "map"
+  default = {
+    "us-east-1" = "image-1234"
+    "us-west-2" = "image-4567"
+  }
+}
+
+variable "usersage" {
+    type = map
+    default = {
+        gaurav = 20
+        saurav = 19
+    }
+}
+output "userage" {
+    value = "my name is gaurav and my age is ${lookup(var.usersage, "gaurav")}"
+}
+
+######################### Terraform TFVARs Files ##################
+
+++ To set lots of variables, it is more easy to specify their values in a variable file (with a filename ending in either .tfvars or .tfvars.json).
+
+Terraform automatically loads a number of variable files if they are present: - 
+
+>> Files named exactly terraform.tfvars or terraform.tfvars.json.
+>> Any files with names ending in .auto.tfvars or .auto.tfvars.json.
+
+variable age {
+    type = number
+}
+
+variable "username" {
+  type = string
+}
+
+output printname {
+        value = "Hello, ${var.username}, your age is ${var.age}"
+}
+
+###### terraform.tfvars files ############
+
+age=40
+username="Sehgal" 
+
+#####Terraform can use Environment Variable by exporting variable as per oS ########################################
+
+Terraform Variable Precedence
+
+Environment variables
+The terraform.tfvars file, if present.
+The terraform.tfvars.json file, if present.
+Any *.auto.tfvars or *.auto.tfvars.json files, processed in lexical order of their filenames.
+Any -var and -var-file options on the command line, in the order they are provided. (This includes variables set by a Terraform Cloud workspace.)
+
+
+
