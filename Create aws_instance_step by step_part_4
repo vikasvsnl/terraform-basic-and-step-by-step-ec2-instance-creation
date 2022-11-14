@@ -1,0 +1,34 @@
+Terraform Taint command usage :- 
+
+++ The terraform taint command manually marks a Terraform-managed resource as tainted, forcing it to be destroyed and recreated on the next apply.
+++ This command will not modify infrastructure but does modify the state file in order to mark a resource as tainted. Once a resource is marked as tainted, 
+    the next plan will show that the resource will be destroyed and recreated and the next apply will implement this change.
+++ terraform taint aws_security_group.allow_tls [ element which needs to be tainted ]
+
+AWS USER Data :-
+++ userdata is the set of commands that you can provide to a EC2 instance at launch time.
+++ Below user data we want to install on Ec2 while booting
+
+++ below is content for file myscript.sh and this content we want on EC2 machine
+=========================================================================================
+#!/bin/bash
+apt-get update
+apt-get install apache2 -y
+echo "Hi Sehgal" >/var/www/html/myfile.txt
+========================================================================================
+For this terraform code will be >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+resource "aws_instance" "ntp_server" {
+  ami           = "ami-0e6329e222e662a52"
+  instance_type = "t2.micro"
+  key_name      = aws_key_pair.key-tf.key_name
+  vpc_security_group_ids = ["${aws_security_group.allow_tls.id}"]
+  tags = {
+    Name = "first-terraform-instance"
+  }
+  user_data = file("${path.module}/myscript.sh") >>>>>>>>>>>>>>>>>> addition from last code 
+}
+=====================================================================================
+
+++ Only problem with user data by terraform is terraform will not be able to check apach2 is installed on EC2 machine or not for this terraform has provisioner.
+++ We can say terraform is for IAC & we have chef/puppet.ansible for configuration management.
