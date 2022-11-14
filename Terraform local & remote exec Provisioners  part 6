@@ -1,0 +1,57 @@
+Local-Exec Provisioner
+
+++ The local-exec provisioner invokes a local executable after a resource is created. 
+++ This invokes a process on the machine running Terraform, not on the resource.
+++ Use case for this can be like we need to triggere jenkins pipeline after instance creation
+++ or ansible playbook we need to run after instance creation etc
+++ like we want to save Ec2 instance related data in file 
+++ " When destroy" like condition you can use before deleting EC2 Machine all DB data needs to be copied or something else
+Remote-exec provisioner
+++ The remote-exec provisioner invokes a script on a remote resource after it is created. This can be used to run a configuration management tool.
+++ The remote-exec provisioner supports both ssh and winrm type connections.
+
+resource "aws_instance" "ntp_server" {
+  ami           = "ami-0e6329e222e662a52"
+  instance_type = "t2.micro"
+  key_name      = aws_key_pair.key-tf.key_name
+  vpc_security_group_ids = ["${aws_security_group.allow_tls.id}"]
+  tags = {
+    Name = "first-terraform-instance"
+  }
+  user_data = file("${path.module}/myscript.sh")
+ connection {
+    type        = "ssh"
+    user        = "ec2-user"
+    private_key = file("${path.module}/id_rsa")
+    host        = self.public_ip
+  }
+
+  # file, local-exec, remote-exec
+  provisioner "file" {
+    source      = "readme.md"      # terraform machine
+    destination = "/tmp/readme.md" # remote machine
+  }
+  provisioner "file" {
+    content     = "this is test content" # terraform machine
+    destination = "/tmp/content.md"      # remote machine
+    
+  provisioner "local-exec" {
+    command = "echo testing > /tmp/test.txt"
+  }
+  provisioner "local-exec" {
+    working_dir = "/tmp"
+    command = "echo ${self.public_ip}>myip.txt"
+  }
+  provisioner "local-exec" {                   >> This provisioner will be run when you run terraform destroy and all other at the time of create
+    when = destroy
+    command = "echo testing > /tmp/vik.txt"
+  }
+  provisioner "remote-exec" {             >>>>>>>>>>>>>>>> remoto provisioner
+    inline = [
+      "ifconfig > /tmp/ifconfig.output",
+      "echo 'hello gaurav'>/tmp/test.txt"
+    ]
+  }
+  
+  }
+}
