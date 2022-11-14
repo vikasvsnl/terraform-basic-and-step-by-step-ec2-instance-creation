@@ -1,0 +1,71 @@
+In this part we will create security group that will allow ports and will assign this security group to Ec2 instance
+In this we will use terrform Dynamic Block
+Benefits of dynamic blocks { Speed/Reliability/Re-use & clarity}
+If we want to allow multiple ports like 80/22/443 Dynamic Block will help by smaller line code
+Without Dynamic Block code will be like below for each port we need to add ingress or egree block
+
+resource "aws_security_group" "allow_tls" {
+  name        = "allow_tls"
+  description = "Allow TLS inbound traffic"
+  vpc_id      = aws_vpc.main.id
+
+  ingress {                                        >>>>>>>>>>>>>>>>>>>>. for 443
+    description      = "TLS from VPC"
+    from_port        = 443
+    to_port          = 443
+    protocol         = "tcp"
+    cidr_blocks      = [aws_vpc.main.cidr_block]
+    ipv6_cidr_blocks = [aws_vpc.main.ipv6_cidr_block]
+  }
+  
+  resource "aws_security_group" "allow_tls" {
+  name        = "allow_tls"
+  description = "Allow TLS inbound traffic"
+  vpc_id      = aws_vpc.main.id
+
+  ingress {                                           >>>>>>>>>>>>>>>>>>>>>>>>> 80 and this needs to be repated for every part
+    description      = "TLS from VPC"
+    from_port        = 80
+    to_port          = 80
+    protocol         = "tcp"
+    cidr_blocks      = [aws_vpc.main.cidr_block]
+    ipv6_cidr_blocks = [aws_vpc.main.ipv6_cidr_block]
+  }
+  
+  Here Dyanamic block helps
+--------------------- File content for aws-sg.tf  ---------------------------------  
+  resource "aws_security_group" "allow_tls" {
+  name        = "allow_tls"
+  description = "Allow TLS inbound traffic"
+  dynamic "ingress" {
+    for_each = [80,8080,443,9090,22]
+    iterator = port
+    content {
+      description = "TLS from VPC"
+      from_port   = port.value
+      to_port     = port.value
+      protocol    = "tcp"
+      cidr_blocks = ["0.0.0.0/0"]
+    }
+  }
+  egress {
+    from_port        = 0
+    to_port          = 0
+    protocol         = "-1"
+    cidr_blocks      = ["0.0.0.0/0"]
+    ipv6_cidr_blocks = ["::/0"]
+  }
+}
+
+-----------------------------------------------------------------------------------------------------
+
+Attaching security group to Ec2 instance
+
+resource "aws_instance" "ntp_server" {
+  ami           = "ami-0e6329e222e662a52"
+  instance_type = "t2.micro"
+  key_name      = aws_key_pair.key-tf.key_name
+  tags = {
+    Name = "first-terraform-instance"
+  }
+}
