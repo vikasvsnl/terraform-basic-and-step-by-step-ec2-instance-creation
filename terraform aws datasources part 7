@@ -1,0 +1,27 @@
+A data source is accessed via a special kind of resource known as a data resource, declared using a data block.
+
+data "aws_ami" "ubuntu" {
+  most_recent = true
+  owners      = ["099720109477"]
+  filter {
+    name   = "name"
+    values = ["${var.image_name}"]
+  }
+  filter {
+    name   = "root-device-type"
+    values = ["ebs"]
+  }
+  filter {
+    name   = "virtualization-type"
+    values = ["hvm"]
+  }
+}
+
+resource "aws_instance" "ntp_server" {
+  ami           = data.aws_ami.ubuntu.id >>>>>>>>>>>>>>>>>>>>>>>>> this is change with the help of data sources
+  instance_type = "t2.micro"
+  key_name      = aws_key_pair.key-tf.key_name
+  vpc_security_group_ids = ["${aws_security_group.allow_tls.id}"]
+  tags = {
+    Name = "first-terraform-instance"
+  }
