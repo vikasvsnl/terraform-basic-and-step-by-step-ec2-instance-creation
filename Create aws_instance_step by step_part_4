@@ -14,7 +14,7 @@ AWS USER Data :-
 #!/bin/bash
 apt-get update
 apt-get install apache2 -y
-echo "Hi Sehgal" >/var/www/html/myfile.txt
+echo "Hi Sehgal" >/var/myfile.txt
 ========================================================================================
 For this terraform code will be >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
