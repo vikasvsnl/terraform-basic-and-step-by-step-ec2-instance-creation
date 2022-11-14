@@ -1,0 +1,38 @@
+++ Provisioners:-
+
+Provisioners are used to executing scripts on a local or remote machine as part of resource creation or destruction. Provisioners can be used to bootstrap a resource, 
+cleanup before destroy, run configuration management, etc.
+
+++ File Provisioner:-
+>> The file provisioner is used to copy files or directories from the machine executing Terraform to the newly created resource. 
+>> The file provisioner supports both ssh and winrm type connections.
+
+In the below we have resource [ aws_instance.ntp_server.public_ip] we can have chicken egg case like if we refer same thing in connection block 
+[ aws_instance.ntp_server.public_ip ] also to solve that only we are using "self.public_ip" instead full name as both are in same file.
+
+resource "aws_instance" "ntp_server" {
+  ami           = "ami-0e6329e222e662a52"
+  instance_type = "t2.micro"
+  key_name      = aws_key_pair.key-tf.key_name
+  vpc_security_group_ids = ["${aws_security_group.allow_tls.id}"]
+  tags = {
+    Name = "first-terraform-instance"
+  }
+  user_data = file("${path.module}/myscript.sh") >>>>>>>>>>>>>> myscript.sh file is created in dir
+ connection {
+    type        = "ssh"
+    user        = "ec2-user"
+    private_key = file("${path.module}/id_rsa")
+    host        = self.public_ip           >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+  }
+
+  # file, local-exec, remote-exec
+  provisioner "file" {
+    source      = "readme.md"      # terraform machine
+    destination = "/tmp/readme.md" # remote machine
+  }
+  provisioner "file" {
+    content     = "this is test content" # terraform machine
+    destination = "/tmp/content.md"      # remote machine
+  }
+}
