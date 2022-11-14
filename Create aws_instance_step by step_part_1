@@ -1,0 +1,26 @@
+++ We can create EC2 instance with below minimum configurations for this two files needs to be created [ instance.tf & provider.tf]
+
+But we can not access this EC2 instance as there is no key-pair is attached for SSH & also security group is default is attached that is not allowing 
+access from anywhere
+
+++ Next Step is creating SSH key and assign to EC2 instance
+
+########### content for instance.tf #######################
+
+resource "aws_instance" "ntp_server" {
+  ami           = "ami-0e6329e222e662a52"
+  instance_type = "t2.micro"
+  tags = {
+    Name = "first-terraform-instance"
+  }
+}
+
+########### content for provider.tf #######################
+
+provider "aws" {
+  region     = "ap-south-1"
+  access_key = "YOUR_ACCESS_KEY_HERE"
+  secret_key = "YOUR_SECRET_KEY_HERE"
+} 
+
+================================================================================================================================
