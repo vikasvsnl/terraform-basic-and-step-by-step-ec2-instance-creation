@@ -1,0 +1,12 @@
++ This help in save the terraform state file  to remote backend like S3 or in Cloud
+++ by default terraform use local backend.
+++ S3 bucket needs to be created first before initilzating remote backend in teraform
+
+terraform {
+  backend "s3" {
+    bucket = "sehgal-bucket"
+    region = "ap-south-1"
+    key="terraform.tfstate"
+    dynamodb_table = "sehgal-tf-table"
+  }
+}
